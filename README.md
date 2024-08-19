@@ -16,5 +16,5 @@ Example row in database :<br>
 `{"id":99,"name":"Jacddd55","email":"jack9@example.com"}`<br>
 
 add this to your ~/.zshrc or ~/.bashrc<br>
-  `export DATABASE_URL="postgres://new_user:new_password@localhost:5432/new_db"`
+  `export DATABASE_URL="postgres://new_user:new_password@localhost:5432/new_db"`<br>
 Use your own credentials though!
