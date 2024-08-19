@@ -76,6 +76,10 @@ async fn get_user(data: web::Data<AppState>, user_id: web::Path<i32>) -> impl Re
 async fn main() -> Result<(), std::io::Error> {
     env_logger::init(); // Initialize the logger
     dotenv().ok();
+
+    let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
+    let address = format!("0.0.0.0:{}", port);
+
     let database_url = dotenv::var("DATABASE_URL").expect("DATABASE_URL must be set");
     println!("{:?}", database_url);
 
@@ -96,7 +100,7 @@ async fn main() -> Result<(), std::io::Error> {
             }))
             .route("/user/{id}", web::get().to(get_user))
     })
-    .bind("0.0.0.0:8080")?
+    .bind(&address)?
     .run()
     .await
 }
