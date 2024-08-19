@@ -18,9 +18,8 @@ struct AppState {
 struct User {
     id: i32,
     name: String,
-    email : String
+    email: String,
 }
-
 
 async fn get_user(data: web::Data<AppState>, user_id: web::Path<i32>) -> impl Responder {
     let user_id = user_id.into_inner();
@@ -45,7 +44,13 @@ async fn get_user(data: web::Data<AppState>, user_id: web::Path<i32>) -> impl Re
     {
         Ok(user) => {
             // Serialize the user data
-            let user_data = serde_json::to_string(&user).unwrap();
+            let user_data = match serde_json::to_string(&user) {
+                Ok(data) => data,
+                Err(e) => {
+                    error!("Failed to serialize user data: {:?}", e);
+                    return HttpResponse::InternalServerError().body("Internal server error");
+                }
+            };
 
             // Store the user data in the cache
             drop(cache); // Unlock the cache before updating it
@@ -67,15 +72,20 @@ async fn get_user(data: web::Data<AppState>, user_id: web::Path<i32>) -> impl Re
     }
 }
 
-
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<(), std::io::Error> {
     env_logger::init(); // Initialize the logger
-    dotenv::dotenv().ok();
+    dotenv().ok();
     let database_url = dotenv::var("DATABASE_URL").expect("DATABASE_URL must be set");
     println!("{:?}", database_url);
 
-    let db_pool = PgPool::connect(&database_url).await.unwrap();
+    let db_pool = PgPool::connect(&database_url)
+        .await
+        .map_err(|e| {
+            eprintln!("Failed to connect to the database: {}", e);
+            std::io::Error::new(std::io::ErrorKind::Other, "Database connection error")
+        })?;
+    
     let cache = Arc::new(Mutex::new(HashMap::new()));
 
     HttpServer::new(move || {
