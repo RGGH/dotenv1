@@ -1,12 +1,15 @@
-#![allow(unused)]
+// main.rs
+/// see https://youtu.be/TVT7VHynTCc for a demo video ///
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
+use log::{error, info};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::env;
 use std::sync::{Arc, Mutex};
-use log::{info, error}; // Add logging
+
+mod banner;
 
 #[derive(Clone)]
 struct AppState {
@@ -74,6 +77,11 @@ async fn get_user(data: web::Data<AppState>, user_id: web::Path<i32>) -> impl Re
 
 #[actix_web::main]
 async fn main() -> Result<(), std::io::Error> {
+    banner::make_banner();
+    println!(
+        "{:?}",
+        "example usage : curl http://localhost:8080/user/4\n"
+    );
     env_logger::init(); // Initialize the logger
     dotenv().ok();
 
@@ -81,15 +89,12 @@ async fn main() -> Result<(), std::io::Error> {
     let address = format!("0.0.0.0:{}", port);
 
     let database_url = dotenv::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    println!("{:?}", database_url);
 
-    let db_pool = PgPool::connect(&database_url)
-        .await
-        .map_err(|e| {
-            eprintln!("Failed to connect to the database: {}", e);
-            std::io::Error::new(std::io::ErrorKind::Other, "Database connection error")
-        })?;
-    
+    let db_pool = PgPool::connect(&database_url).await.map_err(|e| {
+        eprintln!("Failed to connect to the database: {}", e);
+        std::io::Error::new(std::io::ErrorKind::Other, "Database connection error")
+    })?;
+
     let cache = Arc::new(Mutex::new(HashMap::new()));
 
     HttpServer::new(move || {
@@ -104,4 +109,3 @@ async fn main() -> Result<(), std::io::Error> {
     .run()
     .await
 }
-
