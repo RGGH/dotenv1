@@ -17,4 +17,5 @@ Example row in database :<br>
 
 add this to your ~/.zshrc or ~/.bashrc<br>
   `export DATABASE_URL="postgres://new_user:new_password@localhost:5432/new_db"`<br>
+remmber to do `source ~/.zshrc or source ~/.bashrc`<br>
 Use your own credentials though!
