@@ -3,7 +3,8 @@
 ---
 ## Watch the video 
   https://youtu.be/TVT7VHynTCc
-
+---
+Create a table to work with this code, make sure you have Postrges installed first<br>
   `CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
