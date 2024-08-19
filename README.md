@@ -4,6 +4,7 @@
 ## Watch the video 
   https://youtu.be/TVT7VHynTCc
 
+Example row in database :<br>
 `{"id":99,"name":"Jacddd55","email":"jack9@example.com"}`<br>
 
 add this to your ~/.zshrc or ~/.bashrc<br>
